@@ -2,10 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { MONGO_USER, MONGO_PASSWORD, MONGO_IP, MONGO_PORT } = require('./config/config');
 const session = require('express-session');
-
-// Initialize client.
-
 const { createClient } = require('redis');
+const cors = require('cors');
+
 let redisClient = createClient({
   host: 'redis',
   port: 6379,
@@ -34,7 +33,8 @@ const connectWithRetry = () => {
     });
 };
 
-// Initialize sesssion storage.
+app.enable('trust proxy');
+app.use(cors({}));
 app.use(
   session({
     store: redisStore,
@@ -50,8 +50,9 @@ app.use(express.json());
 
 const port = process.env.PORT || 3000;
 
-app.get('/', (req, res) => {
+app.get('/api/v1', (req, res) => {
   res.send('<h2>Hi, there!!!</h2>');
+  console.log('yeah it ran');
 });
 app.use('/api/v1/posts', postRouter);
 app.use('/api/v1/users', userRouter);
